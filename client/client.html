@@ -6,6 +6,110 @@
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.min.js"></script>
   <script type="text/babel">
+    const handleResponse = (xhr) => {
+      const type = document.querySelector("#type");
+      const content = document.querySelector("#content");
+      
+      const obj = JSON.parse(xhr.response);
+      
+      // check the xhr status and display accordingly
+      switch(xhr.status) {
+        case 200:
+          content.innerHTML = `<b>Success</b>`;
+          break;
+        case 400:
+          content.innerHTML = `<b>Bad Request</b>`;
+          break;
+        case 401:
+          content.innerHTML = `<b>Unauthorized</b>`;
+          break;
+        case 403:
+          content.innerHTML = `<b>Forbidden</b>`;
+          break;
+        case 500:
+          content.innerHTML = `<b>Internal Server Error</b>`;
+          break;
+        case 501:
+          content.innerHTML = `<b>Not Implemented</b>`;
+          break;
+        default:
+          content.innerHTML = `<b>Resource Not Found</b>`;
+          break;        
+      }
+      
+      if(obj.message)
+        content.innerHTML += `<br><br><b>${obj.message}</b>`;
+      
+      // xhr/json objects
+      if(type.value === 'application/json') {
+        console.dir(JSON.parse(xhr.response));
+      } else {
+        var json = JSON.parse(xhr.response);
+        var XML;
+        XML = `<response>`
+        XML += `<message>${json.message}</message>`;
+        if(json.id)
+          XML += `<id>${json.id}</id>`
+        XML += `</response>`;
+        console.dir(XML);
+      }
+    };
+
+    const sendAjax = (url) => {
+      const type = document.querySelector("#type");
+      
+      const xhr = new XMLHttpRequest();
+      
+      xhr.open('GET', url);
+      
+      xhr.setRequestHeader("Accept", type.value);
+      
+      xhr.onload = () => handleResponse(xhr);
+      
+      xhr.send();
+    };
+
+    const processInput = () => {
+      // page.options[0] is success etc
+      // make functions for each status
+      const page = document.querySelector("#page");
+      
+      // const success = () => sendAjax('/success');
+      
+      switch(page.value) {
+        case '/success':
+          sendAjax('/success');
+          break;
+        case '/badRequest':
+          sendAjax('/badRequest');
+          break;
+        case '/unauthorized':
+          sendAjax('/unauthorized');
+          break;
+        case '/forbidden':
+          sendAjax('/forbidden');
+          break;
+        case '/internal':
+          sendAjax('/internal');
+          break;
+        case '/notImplemented':
+          sendAjax('/notImplemented');
+          break;
+        case '/notFound':
+          sendAjax('/notFound');
+          break;
+        default:
+          break;
+      }
+    };
+
+    const init = () => {
+      const sendButton = document.querySelector("#send");
+      
+      sendButton.addEventListener('click', processInput);
+    };
+
+    window.onload = init;
 
   </script>
 </head>
